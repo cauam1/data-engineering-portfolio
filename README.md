@@ -1,160 +1,42 @@
-🌟 Hybrid OLAP → Lakehouse + Warehouse Pipeline
-🚀 Project Overview
-
-This is a highly advanced data engineering pipeline, built for enterprise-level OLAP, Data Warehousing, and BI integration. It extracts data from multiple OLAP cubes, transforms it through Bronze → Silver → Gold layers, implements SCD Type 2, enforces strict data quality, calculates KPIs, and exposes the data via a FastAPI interface for analytics and dashboards.
-
-This project demonstrates architecture-level design, production-ready standards, and senior-level Python engineering skills.
-
-🎯 Key Features
-
-Multi-Cube Extraction: Automatically extracts data from multiple MDX cubes with dynamic schema detection.
-
-Layered Architecture:
-
-Bronze: Raw, minimally processed Parquet files.
-
-Silver: Cleaned, validated, SCD1/SCD2 applied, historical tracking.
-
-Gold: Aggregated tables with derived metrics and KPIs.
-
-SCD Type 2: Tracks historical changes with effective dates, end dates, and current flags.
-
-Delta-Like Incremental Load: Only new or changed rows are processed.
-
-Data Quality & Validation: 30+ rules including null ratio, duplicates, and anomaly detection.
-
-Parallel Processing: Optional PySpark integration for large datasets.
-
-Data Lineage: Complete traceability of transformations and sources.
-
-Metrics & KPIs: Automatic computation of business-critical metrics (Sales Growth, Cumulative Sales, etc.).
-
-API Access: FastAPI endpoints for querying Gold tables and metrics.
-
-Logging: Structured JSON logs for auditing, monitoring, and debugging.
-
-BI-Ready: Compatible with Power BI, Tableau, or other visualization tools.
-
-Fully Configurable: YAML-based central configuration for all pipeline parameters.
-
-📂 Project Structure
-project_hybrid_pipeline/
-│
-├─ config/
-│   └─ config.yaml          # Central configuration (cubes, paths, SCD, logging)
-│
-├─ extract/
-│   └─ extract_mdx.py       # Multi-cube MDX extraction
-│
-├─ transform/
-│   ├─ bronze_transform.py  # Bronze layer
-│   ├─ silver_transform.py  # Silver layer with validation & SCD2
-│   ├─ gold_transform.py    # Gold layer with KPIs & metrics
-│
-├─ utils/
-│   ├─ logger.py            # Structured JSON logging
-│   ├─ data_quality.py      # 30+ data quality rules
-│   └─ metrics.py           # KPI calculations
-│
-├─ api/
-│   └─ api.py               # FastAPI endpoints for Gold layer access
-│
-├─ notebooks/
-│   └─ exploration.ipynb    # Data exploration & lineage verification
-│
-└─ README.md
-
-⚡ Installation
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux / Mac
-venv\Scripts\activate     # Windows
-
-# Install dependencies
-pip install pandas pyarrow pyodbc fastapi uvicorn pyyaml
-pip install pyspark  # Optional for parallelization
-
-🏗 Pipeline Execution
-
-Extract Data from OLAP Cubes
-
-python extract/extract_mdx.py
-
-
-Transform to Bronze Layer
-
-python transform/bronze_transform.py
-
-
-Transform to Silver Layer
-
-python transform/silver_transform.py
-
-
-Transform to Gold Layer (KPIs & Metrics)
-
-python transform/gold_transform.py
-
-
-Start FastAPI for Gold Data Access
-
-uvicorn api.api:app --reload
-
-🌐 API Endpoints
-
-List Gold Tables:
-GET /tables → Returns all available Gold tables.
-
-Query Gold Table Sample:
-GET /table/{table_name} → Returns first 50 rows of specified Gold table.
-
-Get Metrics:
-GET /metrics/{table_name} → Returns aggregated metrics (sum, average, KPIs).
-
-📊 Data Quality & Logging
-
-Logs stored in JSON format: logs/pipeline.json.
-
-Tracks every stage: extraction, transformation, validation, KPIs, API queries.
-
-Enforces 30+ data quality rules, including nulls, duplicates, and outliers.
-
-🛠 Configuration
-
-Centralized in config/config.yaml.
-
-Define:
-
-Cube connections (OLAP server, credentials)
-
-Data lake paths (Bronze/Silver/Gold)
-
-Partitioning and incremental load
-
-Logging and SCD2 parameters
-
-Parallelization (PySpark)
-
-Power BI / Tableau integration
-
-👥 Intended Audience
-
-Data Engineers: Build enterprise-grade ETL/ELT pipelines.
-
-Analytics / BI Teams: Consume validated, KPI-ready Gold tables.
-
-Data Architects: Reference pipeline demonstrates scalable, maintainable architecture.
-
-🏆 Highlights
-
-Enterprise-grade, production-ready pipeline.
-
-Supports millions of rows, multiple cubes, and parallel processing.
-
-Full historical tracking (SCD2) and incremental updates.
-
-FastAPI interface for dashboards and API-driven analytics.
-
-JSON structured logging and auditable transformations.
-
-Demonstrates senior-level Python, architecture, and data engineering skills.
+# Hybrid OLAP → Lakehouse & Data Warehouse ETL Pipeline
+
+This project implements a robust, enterprise-grade ETL pipeline that extracts data from OLAP cubes, transforms it through multiple layers, and delivers Gold-level datasets ready for analytics and BI dashboards such as Power BI and Tableau. The pipeline is structured in three layers: Bronze for raw data extraction, Silver for cleaned and normalized data with historical tracking (SCD Type 1 & Type 2), and Gold for aggregated, KPI-enriched tables ready for analytics.
+
+The pipeline features MDX cube extraction capable of handling multiple cubes simultaneously with 20+ columns, hierarchies, and measures. Data is transformed through Bronze, Silver, and Gold layers, enriched with dimensions like DimDate, DimRegion, and DimProduct, and aggregated into meaningful KPIs. Data quality validations include null checks, duplicate detection, and numeric range validations, ensuring enterprise-level data integrity. The Gold layer computes metrics such as totals, averages, max, min, cumulative, rolling averages, and derived metrics like SalesPerUnit. Logging and auditing are implemented via structured JSON logs capturing ETL steps, data quality results, and KPI calculations.
+
+The project structure is organized as follows:
+
+├── config/
+│ └── config.yaml # Global configuration for paths, cubes, partitions, and KPIs
+├── data/
+│ ├── bronze/ # Raw data extracted from cubes
+│ ├── silver/ # Cleaned and normalized data
+│ └── gold/ # Aggregated datasets for BI
+├── transform/
+│ ├── bronze_extract.py # Cube extraction logic
+│ ├── bronze_api.py # API integration for extraction
+│ ├── bronze_transform.py # Initial transformation to Bronze layer
+│ ├── silver_transform.py # Silver layer transformations and SCD
+│ └── gold_transform.py # Gold layer aggregations and KPIs
+├── utils/
+│ ├── logger.py # Structured logging utilities
+│ ├── data_quality.py # Data validation functions
+│ └── metrics.py # KPI and metric calculations
+└── README.md
+
+bash
+Copiar código
+
+To install, clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/yourusername/enterprise-etl-pipeline.git
+cd enterprise-etl-pipeline
+pip install -r requirements.txt
+Update config/config.yaml with paths, cube credentials, partitions, KPIs, and other settings before running the pipeline. The pipeline can be executed layer by layer: first run Bronze extraction with bronze_extract.py and bronze_api.py, then transform Bronze to Silver using silver_transform.py, and finally generate Gold tables using gold_transform.py.
+
+Data quality is continuously validated with null checks per column, duplicate detection, and numeric range validations. Advanced versions can include outlier detection. All validation and ETL steps are logged in JSON format to logs/pipeline.log and console, capturing timestamp, event type, messages, and optional metadata.
+
+KPIs and metrics include totals, averages, min, max, cumulative sums, rolling averages, and derived metrics such as SalesPerUnit. The pipeline supports multi-cube aggregation and is designed to be configuration-driven, making it scalable and adaptable to multiple environments and cubes.
+
+For contribution, fork the repository, create feature branches, and submit pull requests with clear descriptions. This project is authored by Cauam Pavonne, specializing in enterprise ETL, data engineering, and analytics pipelines. 
