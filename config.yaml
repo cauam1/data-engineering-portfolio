@@ -1,0 +1,40 @@
+# Mega Hybrid Pipeline Configuration
+
+mdx:
+  cubes:
+    - name: "SalesCube"
+      server: "OLAP_SERVER"
+      database: "SalesDB"
+      username: "user"
+      password: "pass"
+      query: "SELECT {[Measures].[Sales]} ON COLUMNS, {[Date].[Year].Members} ON ROWS FROM [SalesCube]"
+    - name: "InventoryCube"
+      server: "OLAP_SERVER"
+      database: "InventoryDB"
+      username: "user"
+      password: "pass"
+      query: "SELECT {[Measures].[Quantity]} ON COLUMNS, {[Date].[Month].Members} ON ROWS FROM [InventoryCube]"
+
+sql_server:
+  host: "SQL_SERVER_HOST"
+  database: "DataWarehouse"
+  username: "user"
+  password: "pass"
+  driver: "ODBC Driver 18 for SQL Server"
+
+datalake:
+  bronze_path: "./data/bronze/"
+  silver_path: "./data/silver/"
+  gold_path: "./data/gold/"
+
+logging:
+  log_path: "./logs/pipeline.json"
+  level: "INFO"
+
+partitioning:
+  column: "year_month"
+
+data_quality:
+  null_threshold: 0.01
+  duplicate_check: true
+  anomaly_detection: true
