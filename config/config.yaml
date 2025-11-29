@@ -1,0 +1,124 @@
+# --------------------------------------------------
+# GLOBAL CONFIGURATION
+# --------------------------------------------------
+pipeline:
+  name: "Hybrid OLAP to Lakehouse ETL"
+  owner: "Cauam Pavonne"
+  log_level: "INFO"
+  max_retries: 3
+  parallel_extraction: true
+  num_threads: 4
+
+paths:
+  bronze_path: "./data/bronze/"
+  silver_path: "./data/silver/"
+  gold_path: "./data/gold/"
+  logs_path: "./logs/"
+  validation_report_path: "./logs/bronze_validation/"
+
+partitioning:
+  column: "partition_month"
+  default_frequency: "M"   # Monthly partition
+
+# --------------------------------------------------
+# MDX CUBES CONFIGURATION
+# --------------------------------------------------
+mdx:
+  cubes:
+    - name: "SalesCube"
+      server: "MDX_SERVER_01"
+      database: "SalesDB"
+      username: "mdx_user"
+      password: "securepassword123"
+      query: |
+        SELECT
+          {[Measures].[Sales], [Measures].[Quantity]} ON COLUMNS,
+          NON EMPTY [Date].[Calendar].[Date].Members ON ROWS
+        FROM [SalesCube]
+    - name: "InventoryCube"
+      server: "MDX_SERVER_02"
+      database: "InventoryDB"
+      username: "mdx_user"
+      password: "securepassword123"
+      query: |
+        SELECT
+          {[Measures].[Stock], [Measures].[Restock]} ON COLUMNS,
+          NON EMPTY [Product].[Category].[Product].Members ON ROWS
+        FROM [InventoryCube]
+    - name: "OrdersCube"
+      server: "MDX_SERVER_03"
+      database: "OrdersDB"
+      username: "mdx_user"
+      password: "securepassword123"
+      query: |
+        SELECT
+          {[Measures].[OrderCount], [Measures].[OrderAmount]} ON COLUMNS,
+          NON EMPTY [Date].[Calendar].[Date].Members ON ROWS
+        FROM [OrdersCube]
+
+# --------------------------------------------------
+# DATA QUALITY RULES
+# --------------------------------------------------
+data_quality:
+  null_threshold: 0.05          # 5% nulls allowed per column
+  duplicate_check: true
+  range_checks:
+    Sales:
+      min: 0
+      max: 1000000
+    Quantity:
+      min: 0
+      max: 10000
+    Stock:
+      min: 0
+      max: 50000
+
+# --------------------------------------------------
+# GOLD LAYER CONFIG
+# --------------------------------------------------
+gold:
+  aggregations:
+    Sales:
+      - sum
+      - mean
+      - max
+      - min
+    Quantity:
+      - sum
+      - mean
+    Stock:
+      - sum
+      - mean
+  kpis:
+    - total_sales
+    - avg_sales
+    - max_sales
+    - min_sales
+    - total_quantity
+    - avg_quantity
+    - stock_level
+  group_by_dimensions:
+    - Region
+    - Country
+    - City
+    - Product
+    - partition_month
+
+# --------------------------------------------------
+# API CONFIG
+# --------------------------------------------------
+api:
+  host: "0.0.0.0"
+  port: 8000
+  token: "securetoken123"
+  cache_ttl: 300
+  max_limit: 1000
+  default_limit: 50
+
+# --------------------------------------------------
+# OTHER CONFIGS
+# --------------------------------------------------
+notifications:
+  email_alerts: false
+  slack_alerts: false
+
