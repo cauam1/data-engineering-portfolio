@@ -1,146 +1,160 @@
-Hybrid OLAP → Lakehouse + Warehouse Pipeline
-Project Overview
+🌟 Hybrid OLAP → Lakehouse + Warehouse Pipeline
+🚀 Project Overview
 
-This project is a highly advanced data pipeline designed for enterprise-level OLAP and data warehouse environments. It extracts data from multiple MDX cubes, transforms it through Bronze → Silver → Gold layers, implements SCD Type 2, applies full data quality checks, calculates KPIs, and exposes the data via a FastAPI layer for BI integration.
+This is a highly advanced data engineering pipeline, built for enterprise-level OLAP, Data Warehousing, and BI integration. It extracts data from multiple OLAP cubes, transforms it through Bronze → Silver → Gold layers, implements SCD Type 2, enforces strict data quality, calculates KPIs, and exposes the data via a FastAPI interface for analytics and dashboards.
 
-This pipeline is production-ready, highly modular, and follows best practices for data engineering, analytics, and architecture-level design.
+This project demonstrates architecture-level design, production-ready standards, and senior-level Python engineering skills.
 
-Key Features
+🎯 Key Features
 
-Multi-Cube Extraction: Supports multiple OLAP cubes with dynamic schema detection.
+Multi-Cube Extraction: Automatically extracts data from multiple MDX cubes with dynamic schema detection.
 
 Layered Architecture:
 
-Bronze: Raw, minimally cleaned parquet files.
+Bronze: Raw, minimally processed Parquet files.
 
-Silver: Cleaned, validated, SCD1/SCD2 implemented.
+Silver: Cleaned, validated, SCD1/SCD2 applied, historical tracking.
 
-Gold: Aggregated tables, metrics, KPIs.
+Gold: Aggregated tables with derived metrics and KPIs.
 
-SCD Type 2: Full historical tracking of data changes.
+SCD Type 2: Tracks historical changes with effective dates, end dates, and current flags.
 
-Delta-Like Incremental Load: Only updated/new rows are processed.
+Delta-Like Incremental Load: Only new or changed rows are processed.
 
-Data Quality & Validation: 30+ rules including nulls, duplicates, and anomaly detection.
+Data Quality & Validation: 30+ rules including null ratio, duplicates, and anomaly detection.
 
-Parallelization: PySpark or pandas multiprocessing support for large-scale data.
+Parallel Processing: Optional PySpark integration for large datasets.
 
-Data Lineage Tracking: Track origin, transformations, and version of all records.
+Data Lineage: Complete traceability of transformations and sources.
 
-Derived Metrics & KPIs: Automatically computed key business metrics.
+Metrics & KPIs: Automatic computation of business-critical metrics (Sales Growth, Cumulative Sales, etc.).
 
-API Access: FastAPI endpoints to query tables and metrics.
+API Access: FastAPI endpoints for querying Gold tables and metrics.
 
-Logging: Structured JSON logs for monitoring and audit.
+Logging: Structured JSON logs for auditing, monitoring, and debugging.
 
-BI Integration: Ready for Power BI, Tableau, or other visualization tools.
+BI-Ready: Compatible with Power BI, Tableau, or other visualization tools.
 
-Configurable: YAML-based configuration for servers, partitions, and pipeline parameters.
+Fully Configurable: YAML-based central configuration for all pipeline parameters.
 
-Project Structure
+📂 Project Structure
 project_hybrid_pipeline/
 │
 ├─ config/
-│   └─ config.yaml          # Central pipeline configuration
+│   └─ config.yaml          # Central configuration (cubes, paths, SCD, logging)
 │
 ├─ extract/
-│   ├─ extract_mdx.py       # Multi-cube MDX extraction
+│   └─ extract_mdx.py       # Multi-cube MDX extraction
 │
 ├─ transform/
-│   ├─ bronze_transform.py  # Bronze layer transformations
+│   ├─ bronze_transform.py  # Bronze layer
 │   ├─ silver_transform.py  # Silver layer with validation & SCD2
-│   ├─ gold_transform.py    # Gold layer with metrics & KPIs
+│   ├─ gold_transform.py    # Gold layer with KPIs & metrics
 │
 ├─ utils/
-│   ├─ logger.py            # Structured logging in JSON
-│   ├─ data_quality.py      # Data quality and validation rules
-│   └─ metrics.py           # KPI and derived metric calculations
+│   ├─ logger.py            # Structured JSON logging
+│   ├─ data_quality.py      # 30+ data quality rules
+│   └─ metrics.py           # KPI calculations
 │
 ├─ api/
-│   └─ api.py               # FastAPI endpoints for Gold data access
+│   └─ api.py               # FastAPI endpoints for Gold layer access
 │
 ├─ notebooks/
-│   └─ exploration.ipynb    # Data exploration & lineage checks
+│   └─ exploration.ipynb    # Data exploration & lineage verification
 │
 └─ README.md
 
-Installation & Requirements
+⚡ Installation
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
+source venv/bin/activate  # Linux / Mac
 venv\Scripts\activate     # Windows
 
 # Install dependencies
 pip install pandas pyarrow pyodbc fastapi uvicorn pyyaml
 pip install pyspark  # Optional for parallelization
 
-Running the Pipeline
+🏗 Pipeline Execution
 
-Extract data from cubes:
+Extract Data from OLAP Cubes
 
 python extract/extract_mdx.py
 
 
-Transform to Bronze layer:
+Transform to Bronze Layer
 
 python transform/bronze_transform.py
 
 
-Transform to Silver layer:
+Transform to Silver Layer
 
 python transform/silver_transform.py
 
 
-Transform to Gold layer & compute KPIs:
+Transform to Gold Layer (KPIs & Metrics)
 
 python transform/gold_transform.py
 
 
-Start API to query Gold data:
+Start FastAPI for Gold Data Access
 
 uvicorn api.api:app --reload
 
-API Endpoints
+🌐 API Endpoints
 
-List available Gold tables:
-GET /tables
+List Gold Tables:
+GET /tables → Returns all available Gold tables.
 
-Query Gold table sample (first 50 rows):
-GET /table/{table_name}
+Query Gold Table Sample:
+GET /table/{table_name} → Returns first 50 rows of specified Gold table.
 
-Get metrics for table (sum/avg Sales, etc.):
-GET /metrics/{table_name}
+Get Metrics:
+GET /metrics/{table_name} → Returns aggregated metrics (sum, average, KPIs).
 
-Data Quality & Logging
+📊 Data Quality & Logging
 
-All processing is logged in JSON structured logs (logs/pipeline.json).
+Logs stored in JSON format: logs/pipeline.json.
 
-Logs include extraction, transformation, validation, metrics calculation, and API queries.
+Tracks every stage: extraction, transformation, validation, KPIs, API queries.
 
-30+ data quality rules enforce integrity at every stage.
+Enforces 30+ data quality rules, including nulls, duplicates, and outliers.
 
-Configuration
+🛠 Configuration
 
-All pipeline parameters are in config/config.yaml.
+Centralized in config/config.yaml.
 
-Configure cube connections, SQL Server, paths, partitions, logging, SCD2, PySpark parallelism, and Power BI integration.
+Define:
 
-Intended Users
+Cube connections (OLAP server, credentials)
 
-Data Engineers building scalable ETL/ELT pipelines.
+Data lake paths (Bronze/Silver/Gold)
 
-Analytics & BI Teams needing clean, validated, and metric-ready data.
+Partitioning and incremental load
 
-Enterprise Architects wanting fully documented and auditable pipelines.
+Logging and SCD2 parameters
 
-Highlights
+Parallelization (PySpark)
 
-Fully modular, production-ready architecture.
+Power BI / Tableau integration
 
-Supports millions of rows and multiple cubes in parallel.
+👥 Intended Audience
 
-Ready for enterprise-grade BI dashboards.
+Data Engineers: Build enterprise-grade ETL/ELT pipelines.
 
-Complete lineage, incremental load, SCD2, KPIs, and API access.
+Analytics / BI Teams: Consume validated, KPI-ready Gold tables.
 
-Example of enterprise-level Python pipeline, ideal for portfolio showcasing senior / architect skills.
+Data Architects: Reference pipeline demonstrates scalable, maintainable architecture.
+
+🏆 Highlights
+
+Enterprise-grade, production-ready pipeline.
+
+Supports millions of rows, multiple cubes, and parallel processing.
+
+Full historical tracking (SCD2) and incremental updates.
+
+FastAPI interface for dashboards and API-driven analytics.
+
+JSON structured logging and auditable transformations.
+
+Demonstrates senior-level Python, architecture, and data engineering skills.
