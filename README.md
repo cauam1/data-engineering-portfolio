@@ -24,8 +24,6 @@ The project structure is organized as follows:
 │ └── metrics.py # KPI and metric calculations
 └── README.md
 
-bash
-Copiar código
 
 To install, clone the repository and install dependencies:
 
